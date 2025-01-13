@@ -45,10 +45,15 @@ jobs:
           # Initialize an empty JSON object
           JSON_OUTPUT="{}"
           
-          # Iterate through the list of changed files
-          for FILE in ${{ steps.get_changed_files.outputs.changed_files }}; do
-            # Ensure the file matches pyproject.toml
-            if [[ "$FILE" == *pyproject.toml ]]; then
+          # Access the comma-separated list of changed files
+          CHANGED_FILES="${{ steps.get_changed_files.outputs.changed_files }}"
+          
+          # Split the comma-separated list into an array and iterate through it
+          IFS=',' read -r -a FILE_ARRAY <<< "$CHANGED_FILES"
+          
+          for FILE in "${FILE_ARRAY[@]}"; do
+            # Ensure the file matches the pattern 'packages/*/pyproject.toml'
+            if [[ "$FILE" =~ ^packages/[^/]+/pyproject\.toml$ ]]; then
               echo "Processing $FILE..."
               
               # Get the version using `uv`
@@ -64,11 +69,14 @@ jobs:
               JSON_OUTPUT=$(echo "$JSON_OUTPUT" | jq --arg package "packages/$PACKAGE_NAME" --arg version "$VERSION" '. + {($package): $version}')
               
               echo "Updated JSON: $JSON_OUTPUT"
+            else
+              echo "Skipping $FILE as it does not match the pattern 'packages/*/pyproject.toml'"
             fi
           done
           
           # Save the final JSON object as output
           echo "json_output=$JSON_OUTPUT" >> "$GITHUB_OUTPUT"
+
 
       - name: Update JSON file
         run: |
