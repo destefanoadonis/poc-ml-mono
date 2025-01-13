@@ -5,7 +5,7 @@ on:
     paths:
       - 'packages/**/pyproject.toml'
     branches:
-      - main    
+      - main
 
 jobs:
   release-please:
@@ -16,10 +16,10 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: List changed files in push event
+      - name: List changed files
         id: get_changed_files
         run: |          
-          # Get the list of changed files (newline-separated)
+          # Get the list of changed files between commits
           CHANGED_FILES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
           
           echo "Changed files:"
@@ -28,41 +28,39 @@ jobs:
           # Convert newline-separated list to a comma-separated list
           CHANGED_FILES_CSV=$(echo "$CHANGED_FILES" | tr '\n' ',' | sed 's/,$//')
           
-          # Set the output in GITHUB_OUTPUT
-          echo "changed_files=$CHANGED_FILES_CSV" >> "$GITHUB_OUTPUT"     
+          # Set the output
+          echo "changed_files=$CHANGED_FILES_CSV" >> "$GITHUB_OUTPUT"
 
-      - name: Install the latest version of uv
+      - name: Install uv
         uses: astral-sh/setup-uv@v5
         with:
           version: latest
 
-      - name: wadda wada
+      - name: Install toml-cli
         run: uv add toml-cli
 
-      - name: Get versions from changed files
+      - name: Extract versions from changed files
         id: get_versions
         run: |
           # Initialize an empty JSON object
           JSON_OUTPUT="{}"
           
-          # Access the comma-separated list of changed files
+          # Access the list of changed files
           CHANGED_FILES="${{ steps.get_changed_files.outputs.changed_files }}"
           
-          # Split the comma-separated list into an array and iterate through it
+          # Split the comma-separated list into an array
           IFS=',' read -r -a FILE_ARRAY <<< "$CHANGED_FILES"
           
           for FILE in "${FILE_ARRAY[@]}"; do
-            # Ensure the file matches the pattern 'packages/*/pyproject.toml'
+            # Check if the file matches the pattern 'packages/*/pyproject.toml'
             if [[ "$FILE" =~ ^packages/[^/]+/pyproject\.toml$ ]]; then
               echo "Processing $FILE..."
               
-              # Get the version using `uv`
+              # Get the version using uv
               VERSION=$(uv run toml get --toml-path "$FILE" project.version)
               
-              # Extract the package name from the file path (e.g., packages/module1/)
+              # Extract the package name
               PACKAGE_PATH=$(dirname "$FILE")
-              
-              # Format the package name as needed (e.g., replace slashes with dashes)
               PACKAGE_NAME=$(echo "$PACKAGE_PATH" | sed 's/packages\///' | sed 's/\//-/g')
               
               # Add the package and its version to the JSON object
@@ -70,23 +68,21 @@ jobs:
               
               echo "Updated JSON: $JSON_OUTPUT"
             else
-              echo "Skipping $FILE as it does not match the pattern 'packages/*/pyproject.toml'"
+              echo "Skipping $FILE: does not match the pattern 'packages/*/pyproject.toml'"
             fi
           done
           
-          # Save the final JSON object as output
-          echo "json_output=$JSON_OUTPUT" >> "$GITHUB_OUTPUT"
+          # Write the updated JSON to the .release-please-manifest.json file
+          echo "$JSON_OUTPUT" > .release-please-manifest.json
 
-
-      - name: Update JSON file
+      - name: Display updated manifest
         run: |
-          # Write the updated JSON to a file
-          echo '${{ steps.get_versions.outputs.json_output }}' > updated_packages.json
-          cat updated_packages.json  # Print the updated file for debugging
+          echo "Updated .release-please-manifest.json:"
+          cat .release-please-manifest.json
 
-      # - name: Release Please
-      #   uses: googleapis/release-please-action@v4
-      #   with:
-      #     token: ${{ secrets.GITHUB_TOKEN }}
-      #     target-branch: main
-      #     include-component-in-tag: True
+      - name: Run Release Please
+        uses: googleapis/release-please-action@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          target-branch: main
+          include-component-in-tag: true
