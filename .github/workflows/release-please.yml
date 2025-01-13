@@ -16,20 +16,20 @@ jobs:
         with:
           fetch-depth: 0
 
-    - name: List changed files in push event
-      id: get_changed_files
-      run: |          
-        # Get the list of changed files (newline-separated)
-        CHANGED_FILES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
-        
-        echo "Changed files:"
-        echo "$CHANGED_FILES"
-        
-        # Convert newline-separated list to a comma-separated list
-        CHANGED_FILES_CSV=$(echo "$CHANGED_FILES" | tr '\n' ',' | sed 's/,$//')
-        
-        # Set the output in GITHUB_OUTPUT
-        echo "changed_files=$CHANGED_FILES_CSV" >> "$GITHUB_OUTPUT"     
+      - name: List changed files in push event
+        id: get_changed_files
+        run: |          
+          # Get the list of changed files (newline-separated)
+          CHANGED_FILES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
+          
+          echo "Changed files:"
+          echo "$CHANGED_FILES"
+          
+          # Convert newline-separated list to a comma-separated list
+          CHANGED_FILES_CSV=$(echo "$CHANGED_FILES" | tr '\n' ',' | sed 's/,$//')
+          
+          # Set the output in GITHUB_OUTPUT
+          echo "changed_files=$CHANGED_FILES_CSV" >> "$GITHUB_OUTPUT"     
 
       - name: Install the latest version of uv
         uses: astral-sh/setup-uv@v5
@@ -39,42 +39,42 @@ jobs:
       - name: wadda wada
         run: uv add toml-cli
 
-    - name: Get versions from changed files
-      id: get_versions
-      run: |
-        # Initialize an empty JSON object
-        JSON_OUTPUT="{}"
-        
-        # Iterate through the list of changed files
-        for FILE in ${{ steps.get_changed_files.outputs.changed_files }}; do
-          # Ensure the file matches pyproject.toml
-          if [[ "$FILE" == *pyproject.toml ]]; then
-            echo "Processing $FILE..."
-            
-            # Get the version using `uv`
-            VERSION=$(uv run toml get --toml-path "$FILE" project.version)
-            
-            # Extract the package name from the file path (e.g., packages/module1/)
-            PACKAGE_PATH=$(dirname "$FILE")
-            
-            # Format the package name as needed (e.g., replace slashes with dashes)
-            PACKAGE_NAME=$(echo "$PACKAGE_PATH" | sed 's/packages\///' | sed 's/\//-/g')
-            
-            # Add the package and its version to the JSON object
-            JSON_OUTPUT=$(echo "$JSON_OUTPUT" | jq --arg package "packages/$PACKAGE_NAME" --arg version "$VERSION" '. + {($package): $version}')
-            
-            echo "Updated JSON: $JSON_OUTPUT"
-          fi
-        done
-        
-        # Save the final JSON object as output
-        echo "json_output=$JSON_OUTPUT" >> "$GITHUB_OUTPUT"
+      - name: Get versions from changed files
+        id: get_versions
+        run: |
+          # Initialize an empty JSON object
+          JSON_OUTPUT="{}"
+          
+          # Iterate through the list of changed files
+          for FILE in ${{ steps.get_changed_files.outputs.changed_files }}; do
+            # Ensure the file matches pyproject.toml
+            if [[ "$FILE" == *pyproject.toml ]]; then
+              echo "Processing $FILE..."
+              
+              # Get the version using `uv`
+              VERSION=$(uv run toml get --toml-path "$FILE" project.version)
+              
+              # Extract the package name from the file path (e.g., packages/module1/)
+              PACKAGE_PATH=$(dirname "$FILE")
+              
+              # Format the package name as needed (e.g., replace slashes with dashes)
+              PACKAGE_NAME=$(echo "$PACKAGE_PATH" | sed 's/packages\///' | sed 's/\//-/g')
+              
+              # Add the package and its version to the JSON object
+              JSON_OUTPUT=$(echo "$JSON_OUTPUT" | jq --arg package "packages/$PACKAGE_NAME" --arg version "$VERSION" '. + {($package): $version}')
+              
+              echo "Updated JSON: $JSON_OUTPUT"
+            fi
+          done
+          
+          # Save the final JSON object as output
+          echo "json_output=$JSON_OUTPUT" >> "$GITHUB_OUTPUT"
 
-    - name: Update JSON file
-      run: |
-        # Write the updated JSON to a file
-        echo '${{ steps.get_versions.outputs.json_output }}' > updated_packages.json
-        cat updated_packages.json  # Print the updated file for debugging
+      - name: Update JSON file
+        run: |
+          # Write the updated JSON to a file
+          echo '${{ steps.get_versions.outputs.json_output }}' > updated_packages.json
+          cat updated_packages.json  # Print the updated file for debugging
 
       # - name: Release Please
       #   uses: googleapis/release-please-action@v4
