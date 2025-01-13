@@ -85,4 +85,4 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           target-branch: main
-          include-component-in-tag: true
+          include-component-in-tag: true 
