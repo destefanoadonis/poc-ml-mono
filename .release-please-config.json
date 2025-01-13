@@ -1,0 +1,13 @@
+{
+    "include-component-in-tag": true,
+    "tag-separator": "@",
+    "separate-pull-requests": true,
+    "bump-minor-pre-major": true,
+    "release-type": "python",
+    "packages": {
+      "packages/adonis-ml-core": {
+        "package-name": "adonis-ml-core",
+        "changelog-path": "packages/adonis-ml-core/CHANGELOG.md"
+      }
+    }
+  }
