@@ -85,4 +85,14 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           target-branch: main
-          include-component-in-tag: true 
+          release-type: python
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+          repo-url: destefanoadonis/poc-ml-mono
+          github-api-url: https://api.github.com
+          github-graphql-url: https://api.github.com/graphql
+          fork: false
+          include-component-in-tag: false
+          skip-github-release: false
+          skip-github-pull-request: false
+          changelog-host: https://github.com
