@@ -2,8 +2,8 @@ name: Release Please
 
 on:
   push:
-    branches:
-      - main
+    paths:
+      - 'packages/**/pyproject.toml'
 
 jobs:
   release-please:
@@ -11,11 +11,23 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: List changed files in push event
+        id: get_changed_files
+        run: |          
+          CHANGED_FILES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
+          
+          echo "Changed files:"
+          echo "$CHANGED_FILES"
+
+          echo "changed_files=$CHANGED_FILES" >> "$GITHUB_OUTPUT"          
 
       - name: Install the latest version of uv
         uses: astral-sh/setup-uv@v5
         with:
-          version: "latest"   
+          version: latest
 
       - name: wadda wada
         run: uv add toml-cli
@@ -24,8 +36,6 @@ jobs:
         id: get_version
         run: |
           VERSION=$(uv run toml get --toml-path pyproject.toml project.version)
-          echo "Captured version: $VERSION"
-
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
       # - name: Release Please
