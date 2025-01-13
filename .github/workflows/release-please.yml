@@ -23,11 +23,9 @@ jobs:
       - name: Get version
         id: get_version
         run: |
-          # Run the command and capture its output in the VERSION variable.
-          VERSION=$(uv run toml get pyproject.toml project.version)
+          VERSION=$(uv run toml get --toml-path pyproject.toml project.version)
           echo "Captured version: $VERSION"
-          
-          # Write the output in a way that GitHub Actions can use in subsequent steps.
+
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
       # - name: Release Please
