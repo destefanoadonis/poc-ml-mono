@@ -12,11 +12,27 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v4
 
-      - name: Release Please
-        uses: google-github-actions/release-please-action@v4
+      - name: Install the latest version of uv
+        uses: astral-sh/setup-uv@v5
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          target-branch: main
-          release-type: python
-          config-file: release-please-config.json
-          manifest-file: .release-please-manifest.json
+          version: "latest"   
+
+      - name: wadda wada
+        run: uv add toml-cli
+
+      - name: Get version
+        id: get_version
+        run: |
+          # Run the command and capture its output in the VERSION variable.
+          VERSION=$(uv run toml get pyproject.toml project.version)
+          echo "Captured version: $VERSION"
+          
+          # Write the output in a way that GitHub Actions can use in subsequent steps.
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      # - name: Release Please
+      #   uses: googleapis/release-please-action@v4
+      #   with:
+      #     token: ${{ secrets.GITHUB_TOKEN }}
+      #     target-branch: main
+      #     include-component-in-tag: True
