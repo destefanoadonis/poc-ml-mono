@@ -38,6 +38,8 @@ jobs:
         id: get_version
         run: |
           VERSION=$(uv run toml get --toml-path pyproject.toml project.version)
+          echo "Changed VERSION:"
+          echo "$VERSION"
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
       # - name: Release Please
