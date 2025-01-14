@@ -10,15 +10,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout the repository
       - name: Checkout code
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
-      # Step 2: Fetch the commit history for the PR
-      - name: Fetch all commit history
-        run: git fetch --depth=0
-
-      # Step 3: Install dependencies (Node.js is required for commitlint)
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
@@ -27,7 +23,6 @@ jobs:
       - name: Install Commitlint
         run: npm install @commitlint/{cli,config-conventional}
 
-      # Step 4: Lint commit messages
       - name: Lint commit messages
         run: |
           npx commitlint --from=$(git merge-base HEAD origin/main) --to=HEAD
