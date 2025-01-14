@@ -1,14 +1,19 @@
 {
+    "always-update": true,
     "include-component-in-tag": true,
-    "tag-separator": "@",
-    "skip-github-release": false,
-    "separate-pull-requests": true,
     "bump-minor-pre-major": true,
-    "release-type": "python",
+    "bump-patch-for-minor-pre-major": true,
+    "skip-github-release": false,
+    "separate-pull-requests": true,   
+    "tag-separator": "@",
     "packages": {
       "packages/adonis-ml-core": {
         "package-name": "adonis-ml-core",
-        "changelog-path": "packages/adonis-ml-core/CHANGELOG.md"
+        "component": "adonis-ml-core",      
+        "extra-files": [
+            "pyproject.toml"
+        ],
+        "changelog-path": "CHANGELOG.md"
       }
     }
   }
