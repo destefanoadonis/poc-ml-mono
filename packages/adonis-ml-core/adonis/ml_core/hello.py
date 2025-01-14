@@ -1,5 +1,5 @@
 def main():
-    print("Hello from ml-dcore foo")
+    print("Hello from mlasdf-dcore foo")
 
 
 if __name__ == "__main__":
