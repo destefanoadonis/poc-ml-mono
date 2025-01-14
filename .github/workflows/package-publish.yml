@@ -29,7 +29,7 @@ jobs:
         with:
           role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/${{ env.AWS_ACCOUNT_ID }}-${{ env.AWS_REGION }}-${{ env.GH_ROLE_NAME }}
           role-session-name: ${{ env.GH_ROLE_NAME }}-ci-pipeline-session
-          aws-region: ${{ env.AWS_REGION }}      
+          aws-region: ${{ env.AWS_REGION }}
 
       # - id: artifact-endpoint
       #   run: |
