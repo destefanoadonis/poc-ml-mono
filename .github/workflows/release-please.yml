@@ -1,4 +1,4 @@
-name: Release Please
+name: release-please
 
 permissions:
   id-token: write
