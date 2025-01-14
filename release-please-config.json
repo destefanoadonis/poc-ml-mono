@@ -1,0 +1,16 @@
+{
+    "always-update": true,
+    "include-component-in-tag": true,
+    "bump-minor-pre-major": true,
+    "bump-patch-for-minor-pre-major": true,
+    "skip-github-release": false,
+    "separate-pull-requests": true,   
+    "tag-separator": "@",
+    "packages": {
+      "packages/adonis-ml-core": {
+        "package-name": "adonis-ml-core",
+        "component": "adonis-ml-core",
+        "changelog-path": "CHANGELOG.md"
+      }
+    }
+  }
