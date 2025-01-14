@@ -14,8 +14,6 @@ on:
 env:
   AWS_REGION: us-east-1
   AWS_ACCOUNT_ID: 165751034469
-  REPOSITORY_DOMAIN: xx
-  REPOSITORY_NAME: xx
   GH_ROLE_NAME: adonis-core-gh-role      
 
 jobs:
