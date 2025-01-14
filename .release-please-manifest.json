@@ -1,3 +1,4 @@
 {
-    "adonis-ml-core": "0.1.0"
+    "adonis-ml-core": "0.1.0",
+    "packages/adonis-ml-core": "0.1.0"
 }
