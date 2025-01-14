@@ -1,0 +1,41 @@
+name: package-publish
+on:
+  release:
+    types:
+      - published
+  push:
+    branches:
+      - main      
+
+  # workflow_dispatch:
+  #   inputs:
+
+
+env:
+  AWS_REGION: us-east-1
+  AWS_ACCOUNT_ID: 165751034469
+  REPOSITORY_DOMAIN: xx
+  REPOSITORY_NAME: xx
+  GH_ROLE_NAME: adonis-core-gh-role      
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/${{ env.AWS_ACCOUNT_ID }}-${{ env.AWS_REGION }}-${{ env.GH_ROLE_NAME }}
+          role-session-name: ${{ env.GH_ROLE_NAME }}-ci-pipeline-session
+          aws-region: ${{ env.AWS_REGION }}      
+
+      # - id: artifact-endpoint
+      #   run: |
+      #   aws codeartifact get-repository-endpoint --domain-owner $AWS_ACCOUNT_ID --domain $REPOSITORY_DOMAIN --repository $REPOSITORY_NAME --format pypi --query 'repositoryEndpoint' --output text
+      
+      
+      # - id: artifact-token      
+      # - run: |
+      #   aws codeartifact get-authorization-token --domain-owner $AWS_ACCOUNT_ID --domain $REPOSITORY_DOMAIN --query 'authorizationToken' --output text
